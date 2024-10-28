@@ -9,8 +9,8 @@ parser = argparse.ArgumentParser(
     description = "Converts Google Photo Sphere images to a properly aligned equirectangular projection"
 )
 parser.add_argument("FILE", help = "Path to the Google Photo Sphere file")
-parser.add_argument("-H", "--heading", help = "Heading of the edge of the image", type = int)
-parser.add_argument("-N", "--north", help = "X coordinate of true north in the image", type = int)
+parser.add_argument("-H", "--heading", help = "Manually specify the heading of the center of the image", type = int)
+parser.add_argument("-N", "--north", help = "Manually specify the X coordinate of true north in the image", type = int)
 parser.add_argument("-O", "--output", help = "Output filename")
 args = parser.parse_args()
 
