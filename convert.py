@@ -24,7 +24,7 @@ try:
     full_size = (int(metadata["FullPanoWidthPixels"]), int(metadata["FullPanoHeightPixels"]))
     offset = (int(metadata["CroppedAreaLeftPixels"]), int(metadata["CroppedAreaTopPixels"]))
     heading = float(metadata["PoseHeadingDegrees"]) if args.heading is None else args.heading
-    shift = heading / 360 * full_size[0] - full_size[0] // 2 if args.north is None else -args.north - offset[0]
+    shift = int(heading / 360 * full_size[0] - full_size[0] // 2) if args.north is None else -args.north - offset[0]
 except:
     print("Error: Image does not have the required metadata!")
     exit()
@@ -38,7 +38,7 @@ img = img.crop((-offset[0], -offset[1], full_size[0] - offset[0], full_size[1] -
 
 print(f"Shifting image {shift}px to align north...")
 arr = numpy.array(img)
-arr = numpy.roll(arr, int(shift), axis = 1)
+arr = numpy.roll(arr, shift, axis = 1)
 
 # Save shifted array as image
 filename = args.output if args.output is not None else args.FILE.removesuffix(".jpg") + "_equirectangular.png"

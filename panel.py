@@ -56,10 +56,8 @@ class Panel:
     def get_panel_efficiency(self, unix_time):
         angle = self.get_sun_panel_angle(unix_time)
         obstruction = self.get_sun_obstruction(unix_time)
-        if obstruction is None:
-            return None
-        # If angle is > 90 deg, the panel is facing away from the Sun
-        if angle < math.pi / 2:
-            return obstruction * math.cos(angle)
-        else:
+        # Sun is below horizon or sun-panel angle is > 90 deg
+        if self.get_sun_position(unix_time)[1] < 0 or angle > math.pi / 2:
             return 0
+        # Obstruction data is invalid
+        return obstruction * math.cos(angle)

@@ -26,8 +26,20 @@ arr = numpy.array(img)[:,:,0]
 arr[arr == 255] = 1
 arr[arr == 0] = 2
 arr[arr == 127] = 0
+arr[arr > 2] = 2
 
 panel = Panel(args.lat, args.lon, arr, args.azimuth, args.tilt)
 
-for i in range(args.start + 86400 * 30 * 6, args.start + 86400 * 30 * 6 + 86400, 600):
-    print(panel.get_panel_efficiency(i))
+eff_sums = []
+eff_count = 0
+for month in range(12):
+    eff_count = 0
+    eff_sums.append(0)
+    for i in range(args.start + 86400 * 30 * month, args.start + 86400 * 30 * (month + 1), 60):
+        eff_sums[month] += panel.get_panel_efficiency(i)
+        eff_count += 1
+
+for summ in eff_sums:
+    print(summ / eff_count)
+
+print(f"Final: {sum(eff_sums) / eff_count / 12}")
