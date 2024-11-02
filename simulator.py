@@ -14,32 +14,42 @@ parser.add_argument("--lat", help = "Panel latitude", type = float, required = T
 parser.add_argument("--lon", help = "Panel longitude", type = float, required = True)
 parser.add_argument("--azimuth", help = "Panel azimuth", type = float, required = True)
 parser.add_argument("--tilt", help = "Panel tilt angle", type = float, required = True)
-parser.add_argument("--start", help = "Simulation start time (unix)", type = int, default = 1672552800)
-parser.add_argument("--end", help = "Simulation end time (unix)", type = int, default = 1704088800)
+parser.add_argument("--step", help = "Simulation time step (seconds)", type = int, default = 600)
+#parser.add_argument("--start", help = "Simulation start time (unix)", type = int, default = 1672552800)
+#parser.add_argument("--end", help = "Simulation end time (unix)", type = int, default = 1704088800)
 args = parser.parse_args()
 
-print("Reading image...")
+#print("Reading image...")
 img = Image.open(args.FILE)
 arr = numpy.array(img)[:,:,0]
 
 # White = clear, black = undefined, gray = blocked
+#print("Parsing image...")
 arr[arr == 255] = 1
 arr[arr == 0] = 2
 arr[arr == 127] = 0
-arr[arr > 2] = 2
+if arr.max() > 2:
+    print("Error: Image contains invalid pixels.")
+    exit()
 
 panel = Panel(args.lat, args.lon, arr, args.azimuth, args.tilt)
 
-eff_sums = []
-eff_count = 0
+#print("Simulating...")
+months = [1704067200, 1706745600, 1709251200, 1711929600, 1714521600, 1717200000, 1719792000, 1722470400, 1725148800, 1727740800, 1730419200, 1733011200, 1735689600]
+month_efficiencies = [0] * 12
 for month in range(12):
-    eff_count = 0
-    eff_sums.append(0)
-    for i in range(args.start + 86400 * 30 * month, args.start + 86400 * 30 * (month + 1), 60):
-        eff_sums[month] += panel.get_panel_efficiency(i)
-        eff_count += 1
+    start = months[month]
+    end = months[month + 1]
+    efficiency_sum = 0
+    efficiency_count = 0
+    for t in range(start, end, args.step):
+        efficiency_sum += panel.get_panel_efficiency(t)
+        efficiency_count += 1
+    month_efficiencies[month] = efficiency_sum / efficiency_count
+    #print(f"Finished month {month + 1}...")
 
-for summ in eff_sums:
-    print(summ / eff_count)
-
-print(f"Final: {sum(eff_sums) / eff_count / 12}")
+#print("Done.")
+for month in range(12):
+    print(month_efficiencies[month])
+    #print(f"Month {month + 1}: {month_efficiencies[month] * 100:.2f}%")
+#print(f"Average: {sum(month_efficiencies) * 100 / 12:.2f}%")
