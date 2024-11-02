@@ -19,12 +19,12 @@ parser.add_argument("--step", help = "Simulation time step (seconds)", type = in
 #parser.add_argument("--end", help = "Simulation end time (unix)", type = int, default = 1704088800)
 args = parser.parse_args()
 
-#print("Reading image...")
+print("Reading image...")
 img = Image.open(args.FILE)
 arr = numpy.array(img)[:,:,0]
 
 # White = clear, black = undefined, gray = blocked
-#print("Parsing image...")
+print("Parsing image...")
 arr[arr == 255] = 1
 arr[arr == 0] = 2
 arr[arr == 127] = 0
@@ -34,7 +34,7 @@ if arr.max() > 2:
 
 panel = Panel(args.lat, args.lon, arr, args.azimuth, args.tilt)
 
-#print("Simulating...")
+print("Simulating...")
 months = [1704067200, 1706745600, 1709251200, 1711929600, 1714521600, 1717200000, 1719792000, 1722470400, 1725148800, 1727740800, 1730419200, 1733011200, 1735689600]
 month_efficiencies = [0] * 12
 for month in range(12):
@@ -46,10 +46,9 @@ for month in range(12):
         efficiency_sum += panel.get_panel_efficiency(t)
         efficiency_count += 1
     month_efficiencies[month] = efficiency_sum / efficiency_count
-    #print(f"Finished month {month + 1}...")
+    print(f"Finished month {month + 1}...")
 
-#print("Done.")
+print("Done.")
 for month in range(12):
-    print(month_efficiencies[month])
-    #print(f"Month {month + 1}: {month_efficiencies[month] * 100:.2f}%")
-#print(f"Average: {sum(month_efficiencies) * 100 / 12:.2f}%")
+    print(f"Month {month + 1}: {month_efficiencies[month] * 100:.2f}%")
+print(f"Average: {sum(month_efficiencies) * 100 / 12:.2f}%")
